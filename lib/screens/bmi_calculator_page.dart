@@ -27,8 +27,8 @@ class BMIData {
 }
 
 class BMICalculatorPage extends StatefulWidget {
-  final String condition;
-  final String severity;
+  final String condition; // Normal, Asthma, COPD
+  final String severity; 
 
   const BMICalculatorPage({
     required this.condition,
@@ -50,7 +50,7 @@ class _BMICalculatorPageState extends State<BMICalculatorPage> {
   double? bmi;
   String? bmiCategory;
   bool? smoking;
-int? feet;
+  int? feet;
   int? inches;
   double? weightLbs;
 
@@ -83,7 +83,7 @@ int? feet;
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SensorDataScreen(bmiData: bmiData),
+          builder: (context) => MultiSensorDataScreen(bmiData: bmiData),
         ),
       );
     }
@@ -135,48 +135,49 @@ int? feet;
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 20),
-             // Weight Input (Pounds)
-_buildInputField(
-  label: 'Weight (lbs)',
-  onSaved: (value) => weightLbs = double.parse(value!),
-  validator: (value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your weight in pounds';
-    }
-    return null;
-  },
-  keyboardType: TextInputType.number,
-),
+              // Weight Input (Pounds)
+              _buildInputField(
+                label: 'Weight (lbs)',
+                onSaved: (value) => weightLbs = double.parse(value!),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your weight in pounds';
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
+              ),
 
-const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
 // Height Input (Feet)
-_buildInputField(
-  label: 'Height (feet)',
-  onSaved: (value) => feet = int.parse(value!),
-  validator: (value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter height in feet';
-    }
-    return null;
-  },
-  keyboardType: TextInputType.number,
-),
+              _buildInputField(
+                label: 'Height (feet)',
+                onSaved: (value) => feet = int.parse(value!),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter height in feet';
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
+              ),
 
-const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
 // Height Input (Inches)
-_buildInputField(
-  label: 'Height (inches)',
-  onSaved: (value) => inches = int.parse(value!),
-  validator: (value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter height in inches';
-    }
-    return null;
-  },
-  keyboardType: TextInputType.number,
-), const SizedBox(height: 20),
+              _buildInputField(
+                label: 'Height (inches)',
+                onSaved: (value) => inches = int.parse(value!),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter height in inches';
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 20),
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
                   labelText: 'Gender',
@@ -207,7 +208,7 @@ _buildInputField(
                 },
               ),
               const SizedBox(height: 20),
-               DropdownButtonFormField<String>(
+              DropdownButtonFormField<String>(
                 decoration: InputDecoration(
                   labelText: 'Smoking',
                   labelStyle: const TextStyle(color: Color(0xFF39FF14)),
@@ -228,7 +229,8 @@ _buildInputField(
                           child: Text(ans),
                         ))
                     .toList(),
-                onChanged: (value) => setState(() => smoking = value=="yes"?true:false),
+                onChanged: (value) =>
+                    setState(() => smoking = value == "yes" ? true : false),
                 validator: (value) {
                   if (value == null) {
                     return 'Please select your smoking habit';

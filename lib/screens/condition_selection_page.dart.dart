@@ -36,7 +36,7 @@ class ConditionSelectionPage extends StatelessWidget {
             _buildConditionButton(context, 'Normal', () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BMICalculatorPage(condition: "Normal", severity: "None")),
+                MaterialPageRoute(builder: (context) => BMICalculatorPage(condition: "None", severity: "None")),
               );
             }),
             const SizedBox(height: 20),
