@@ -11,7 +11,7 @@ class ConditionSelectionPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xFF0A0F30),
       appBar: AppBar(
-        title: const Text('Breathe AI', style: TextStyle(color: Color(0xFF39FF14)),),backgroundColor: Color(0xFF0A0F30),
+        title: const Text('Lung AI', style: TextStyle(color: Color(0xFF39FF14)),),backgroundColor: Color(0xFF0A0F30),
         centerTitle: true,
           iconTheme: IconThemeData(
     color: Color(0xFF39FF14), // Neon green color for the leading icon

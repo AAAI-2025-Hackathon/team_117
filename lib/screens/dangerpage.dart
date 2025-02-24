@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 
 
 
-class CombinedDataScreen extends StatefulWidget {
+class CombinedDangerDataScreen extends StatefulWidget {
   final BMIData bmiData;
   final Stream<List<String>> sensor1Stream;
   final Stream<List<String>> sensor2Stream;
 
-  const CombinedDataScreen({
+  const CombinedDangerDataScreen({
     Key? key,
     required this.bmiData,
     required this.sensor1Stream,
@@ -17,10 +17,10 @@ class CombinedDataScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CombinedDataScreenState createState() => _CombinedDataScreenState();
+  _CombinedDangerDataScreenState createState() => _CombinedDangerDataScreenState();
 }
 
-class _CombinedDataScreenState extends State<CombinedDataScreen> {
+class _CombinedDangerDataScreenState extends State<CombinedDangerDataScreen> {
   List<String> _sensor1Data = ["Waiting for data..."];
   List<String> _sensor2Data = ["Waiting for data..."];
   late StreamSubscription<List<String>> _sensor1Subscription;
@@ -59,13 +59,13 @@ class _CombinedDataScreenState extends State<CombinedDataScreen> {
         title: const Text("Combined Sensor Data"),
         backgroundColor: Color.fromARGB(255, 107, 255, 114),
       ),
-      backgroundColor: Color.fromARGB(255, 226, 255, 222),
+      backgroundColor: const Color.fromARGB(255, 255, 109, 109),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Center(child: Text("Normal Breathing conditions!!!", style: TextStyle(color: Color.fromARGB(255, 58, 58, 58), fontSize: 40),),),
+            const Center(child: Text("Dangerous Breathing conditions!!!", style: TextStyle(color: Colors.red, fontSize: 40),),),
             // const Text(
             //   "BMI Data:",
             //   style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),

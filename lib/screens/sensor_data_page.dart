@@ -1,4 +1,5 @@
 import 'package:breathe_ai/screens/combined_data.dart';
+import 'package:breathe_ai/screens/dangerpage.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
@@ -21,18 +22,20 @@ class _MultiSensorDataScreenState extends State<MultiSensorDataScreen> {
   Socket? socket2;
   bool _isConnected1 = false;
   bool _isConnected2 = false;
-  
+
+  bool _isDanger = false;
+
   final TextEditingController _ip1Controller = TextEditingController();
   final TextEditingController _port1Controller = TextEditingController();
   final TextEditingController _ip2Controller = TextEditingController();
   final TextEditingController _port2Controller = TextEditingController();
-  
+
   final List<String> _sensor1DataHistory = [];
   final List<String> _sensor2DataHistory = [];
-  
+
   final ScrollController _scroll1Controller = ScrollController();
   final ScrollController _scroll2Controller = ScrollController();
-  
+
   final StreamController<List<String>> _sensor1DataStreamController =
       StreamController<List<String>>.broadcast();
   final StreamController<List<String>> _sensor2DataStreamController =
@@ -47,8 +50,48 @@ class _MultiSensorDataScreenState extends State<MultiSensorDataScreen> {
     _port2Controller.text = "7001";
   }
 
-  Future<Socket?> connectToESP32(Socket? socket, String ip, int port, 
-      void Function(bool) setConnected, List<String> dataHistory,
+  
+// Function to parse PM values from sensor data string
+Map<String, double> parsePMValues(String sensorData) {
+  Map<String, double> values = {
+    'PM1.0': 0.0,
+    'PM2.5': 0.0,
+    'PM10': 0.0,
+  };
+  
+  try {
+    // Split the data string by commas
+    List<String> measurements = sensorData.split(',');
+    
+    for (String measurement in measurements) {
+      measurement = measurement.trim();
+      if (measurement.contains('PM1.0')) {
+        values['PM1.0'] = double.parse(
+          measurement.split(':')[1].replaceAll('µg/m³', '').trim()
+        );
+      } else if (measurement.contains('PM2.5')) {
+        values['PM2.5'] = double.parse(
+          measurement.split(':')[1].replaceAll('µg/m³', '').trim()
+        );
+      } else if (measurement.contains('PM10')) {
+        values['PM10'] = double.parse(
+          measurement.split(':')[1].replaceAll('µg/m³', '').trim()
+        );
+      }
+    }
+  } catch (e) {
+    print('Error parsing PM values: $e');
+  }
+  
+  return values;
+}
+
+  Future<Socket?> connectToESP32(
+      Socket? socket,
+      String ip,
+      int port,
+      void Function(bool) setConnected,
+      List<String> dataHistory,
       StreamController<List<String>> streamController,
       ScrollController scrollController) async {
     try {
@@ -59,10 +102,18 @@ class _MultiSensorDataScreenState extends State<MultiSensorDataScreen> {
         (List<int> data) {
           final receivedData = String.fromCharCodes(data).trim();
           final timestamp = DateTime.now().toIso8601String();
-          setState(() {
-            dataHistory.add('[$timestamp] $receivedData');
-            streamController.add(dataHistory);
-          });
+
+             // Parse PM values
+        Map<String, double> pmValues = parsePMValues(receivedData);
+        
+        // Check if any PM value is greater than 0
+        bool isDangerousLevel = pmValues.values.any((value) => value > 0);
+        
+        setState(() {
+          _isDanger = isDangerousLevel;
+          dataHistory.add('[$timestamp] $receivedData');
+          streamController.add(dataHistory);
+        });
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (scrollController.hasClients) {
@@ -232,7 +283,8 @@ class _MultiSensorDataScreenState extends State<MultiSensorDataScreen> {
                         border: index < data.length - 1
                             ? Border(
                                 bottom: BorderSide(
-                                  color: const Color(0xFF39FF14).withOpacity(0.3),
+                                  color:
+                                      const Color(0xFF39FF14).withOpacity(0.3),
                                 ),
                               )
                             : null,
@@ -360,7 +412,13 @@ class _MultiSensorDataScreenState extends State<MultiSensorDataScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CombinedDataScreen(
+                        builder: (context) => !_isDanger?
+                        CombinedDangerDataScreen(
+                          bmiData: widget.bmiData,
+                          sensor1Stream: _sensor1DataStreamController.stream,
+                          sensor2Stream: _sensor2DataStreamController.stream,
+                        )
+                        : CombinedDataScreen(
                           bmiData: widget.bmiData,
                           sensor1Stream: _sensor1DataStreamController.stream,
                           sensor2Stream: _sensor2DataStreamController.stream,
@@ -382,7 +440,7 @@ class _MultiSensorDataScreenState extends State<MultiSensorDataScreen> {
                     ),
                   ),
                   child: const Text(
-                    'View Combined Data',
+                    'View Quality Information',
                     style: TextStyle(color: Color(0xFF39FF14)),
                   ),
                 ),
